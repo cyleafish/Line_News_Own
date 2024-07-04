@@ -13,7 +13,7 @@ from linebot.v3.messaging import (
 from linebot.v3.exceptions import InvalidSignatureError
 from linebot.v3.webhooks import MessageEvent, TextMessageContent
 from firebase import firebase
-from utils import fetch_news_data, generate_gmini_story  # 引入 utils.py 中的函數
+from utils import fetch_news_data, generate_gmini_story  # 確保 utils.py 中確實有這兩個函數
 
 # 如果不是在生產環境中，則載入 .env 文件中的環境變量
 if os.getenv('API_ENV') != 'production':
