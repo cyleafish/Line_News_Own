@@ -4,6 +4,8 @@ FROM python:3.9
 COPY . /app
 WORKDIR /app
 
+ENV HOST 0.0.0.0
+
 # 安裝必要的套件
 RUN pip install --upgrade pip
 COPY requirements.txt .
