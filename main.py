@@ -16,6 +16,7 @@ from firebase import firebase
 from utils import fetch_news_data, generate_gmini_story
 import random  # 引入 random 模組
 import re  # 引入 re 模組
+import google.generativeai as genai
 
 # 如果不是在生產環境中，則載入 .env 文件中的環境變量
 if os.getenv('API_ENV') != 'production':
