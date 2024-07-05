@@ -88,9 +88,6 @@ async def process_user_message(message, user_id):
                     return "生成故事時出現錯誤。"
         else:
             return "目前沒有相關新聞。"
-    else:
-        # Handle general messages
-        return await handle_general_message(message, user_id)
 
 @app.post("/webhooks/line")
 async def handle_callback(request: Request):
