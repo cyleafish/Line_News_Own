@@ -65,7 +65,7 @@ async def process_user_message(message, user_id):
         return "目前沒有相關新聞。"
     elif "故事" in message:
         # Fetch random news article related to gender equality and emotional education
-        news_response = fetch_news_data("性別平等 OR 情感教育", news_api_key)
+        news_response = fetch_news_data("性別平等", news_api_key)
         if news_response and news_response.get("status") == "ok":
             articles = news_response.get("articles", [])
             if articles:
@@ -75,7 +75,7 @@ async def process_user_message(message, user_id):
                 news_url = random_article.get("url")
 
                 # Generate story based on the news article using Gemini API
-                prompt = f"根據新聞「{news_title}」生成一個故事，與性別平等和情感教育相關。"
+                prompt = f"你是一位性別平等和情感教育老師，你要教導國小生性別平等和情感教育，根據新聞「{news_title}」"\n"描述: {news_description}生成一個故事給學生。"
                 story_response = generate_gmini_story(prompt, gmini_api_key)
                 if story_response:
                     story_text = story_response.get("contents", [{}])[0].get("parts", [{}])[0].get("text", "無法生成故事。")
