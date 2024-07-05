@@ -78,7 +78,7 @@ async def process_user_message(message, user_id):
                 prompt = f"你是一位性別平等和情感教育老師，你要教導國小生性別平等和情感教育，根據新聞「{news_title}」"\n"描述: {news_description}生成一個故事給學生。"
                 story_response = generate_gmini_story(prompt, gmini_api_key)
                 if story_response:
-                    story_text = story_response.get("contents", [{}])[0].get("parts", [{}])[0].get("text", "無法生成故事。")
+                    story_text = story_response.get("contents", [{}])[0].get("parts", [{}])[0].get("text", "沒有故事。")
                     response = f"新聞：\n\n標題: {news_title}\n描述: {news_description}\n\n故事：\n{story_text}\n\n更多詳情: {news_url}"
                     return response
                 else:
@@ -86,8 +86,8 @@ async def process_user_message(message, user_id):
         else:
             return "目前沒有相關新聞。"
     else:
-        # Handle general messages
-        return await handle_general_message(message, user_id)
+        
+        return "無法生成故事。"
 
 @app.post("/webhooks/line")
 async def handle_callback(request: Request):
