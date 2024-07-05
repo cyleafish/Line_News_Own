@@ -13,7 +13,7 @@ from linebot.v3.messaging import (
 from linebot.v3.exceptions import InvalidSignatureError
 from linebot.v3.webhooks import MessageEvent, TextMessageContent
 from firebase import firebase
-from utils import fetch_news_data, generate_gmini_story  # 確保 utils.py 中確實有這兩個函數
+from utils import fetch_news_data, fetch_udn_news, generate_gemini_response  # 確保 utils.py 中確實有這三個函數
 
 # 如果不是在生產環境中，則載入 .env 文件中的環境變量
 if os.getenv('API_ENV') != 'production':
@@ -55,7 +55,12 @@ async def process_user_message(message, user_id):
     處理用戶發送的消息並返回相應的回應。
     """
     if "新聞" in message:
-        # 呼叫 fetch_news_data 函數來獲取新聞
+        # 先调用 fetch_udn_news 函数获取联合新闻网上的新闻
+        udn_news = fetch_udn_news()
+        if udn_news:
+            return udn_news
+
+        # 如果没有联合新闻网的新闻，调用 fetch_news_data 函数来获取新闻
         news_response = fetch_news_data("gender equality OR emotional education", news_api_key)
         if news_response and news_response.get("status") == "ok":
             articles = news_response.get("articles", [])
@@ -64,10 +69,11 @@ async def process_user_message(message, user_id):
                 return f"最新新聞：\n\n標題: {top_article['title']}\n描述: {top_article['description']}\n\n更多詳情: {top_article['url']}"
         return "目前沒有相關新聞。"
     elif "故事" in message:
-        # 呼叫 generate_gmini_story 函數來生成故事
-        story_response = generate_gmini_story("開始你的故事...", user_id, gmini_api_key)
+        # 呼叫 generate_gemini_response 函數來生成故事
+        prompt = f"請為我生成一個關於{message}的故事，並涵蓋性別平等或情感教育的主題。"
+        story_response = generate_gemini_response(prompt, gmini_api_key)
         if story_response:
-            return story_response.get("story", "無法生成故事。")
+            return story_response.get("response", "無法生成故事。")
         return "生成故事時出現錯誤。"
     else:
         return "請問你想了解什麼？可以說「新聞」或「故事」。"
