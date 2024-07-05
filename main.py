@@ -44,7 +44,7 @@ parser = WebhookParser(channel_secret)
 # 配置 Firebase 和 API Key
 firebase_url = os.getenv('FIREBASE_URL')
 news_api_key = os.getenv('NEWS_API_KEY')
-gmini_api_key = os.getenv('GMINI_API_KEY')
+gmini_api_key = os.getenv('GEMINI_API_KEY')
 
 @app.get("/health")
 async def health():
