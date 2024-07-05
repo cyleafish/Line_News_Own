@@ -63,15 +63,31 @@ async def process_user_message(message, user_id):
                 top_article = articles[0]
                 return f"最新新聞：\n\n標題: {top_article['title']}\n描述: {top_article['description']}\n\n更多詳情: {top_article['url']}"
         return "目前沒有相關新聞。"
-    elif "故事" in message:
-        # 呼叫 generate_gmini_story 函數來生成故事
-        prompt = "開始你的故事，與性別平等和情感教育相關。"
-        story_response = generate_gmini_story(prompt, gmini_api_key)
-        if story_response:
-            return story_response.get("contents", [{}])[0].get("parts", [{}])[0].get("text", "無法生成故事。")
-        return "生成故事時出現錯誤。"
+   elif "故事" in message:
+        # Fetch random news article related to gender equality and emotional education
+        news_response = fetch_news_data("性別平等 OR 情感教育", news_api_key)
+        if news_response and news_response.get("status") == "ok":
+            articles = news_response.get("articles", [])
+            if articles:
+                random_article = articles[random.randrange(len(articles))]
+                news_title = random_article.get("title")
+                news_description = random_article.get("description")
+                news_url = random_article.get("url")
+
+                # Generate story based on the news article using Gemini API
+                prompt = f"根據新聞「{news_title}」生成一個故事，與性別平等和情感教育相關。"
+                story_response = generate_gmini_story(prompt, gmini_api_key)
+                if story_response:
+                    story_text = story_response.get("contents", [{}])[0].get("parts", [{}])[0].get("text", "無法生成故事。")
+                    response = f"新聞：\n\n標題: {news_title}\n描述: {news_description}\n\n故事：\n{story_text}\n\n更多詳情: {news_url}"
+                    return response
+                else:
+                    return "生成故事時出現錯誤。"
+        else:
+            return "目前沒有相關新聞。"
     else:
-        return "請問你想了解什麼？可以說「新聞」或「故事」。"
+        # Handle general messages
+        return await handle_general_message(message, user_id)
 
 @app.post("/webhooks/line")
 async def handle_callback(request: Request):
