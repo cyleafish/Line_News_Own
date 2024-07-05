@@ -113,12 +113,79 @@ async def handle_callback(request: Request):
         text = event.message.text
         user_id = event.source.user_id
 
-        reply_message = await process_user_message(text, user_id)
+        if msg_type == 'text':
+
+        if chatgpt is None:
+            messages = []
+        else:
+            messages = chatgpt
+
+        bot_condition = {
+            "清空": 'A',
+            "歧視": 'B',
+            "平等": 'C',
+            "情感": 'D',
+            "其他": 'E'
+        }
+
+        model = genai.GenerativeModel('gemini-1.5-pro')
+        response = model.generate_content(
+            f'請判斷 {text} 裡面的文字屬於 {bot_condition} 裡面的哪一項？符合條件請回傳對應的英文文字就好，不要有其他的文字與字元。')
+        print('=' * 10)
+        text_condition = re.sub(r'[^A-Za-z]', '', response.text)
+        print(text_condition)
+        print('=' * 10)
+
+        if text_condition == 'A':
+            fdb.delete(user_chat_path, None)
+            reply_msg = '已清空對話紀錄'
+        elif text_condition == 'B':
+            # Handle discrimination-related messages
+            # Generate story based on the message using Gemini API
+            prompt = f"根據訊息「{text}」，生成一個故事，與性別歧視相關。"
+            story_response = generate_gmini_story(prompt, gmini_api_key)
+            if story_response:
+                story_text = story_response.get("contents", [{}])[0].get("parts", [{}])[0].get("text", "無法生成故事。")
+                reply_msg = f"故事：\n{story_text}"
+            else:
+                reply_msg = "生成故事時出現錯誤。"
+        elif text_condition == 'C':
+            # Handle equality-related messages
+            # Generate story based on the message using Gemini API
+            prompt = f"根據訊息「{text}」，生成一個故事，與性別平等相關。"
+            story_response = generate_gmini_story(prompt, gmini_api_key)
+            if story_response:
+                story_text = story_response.get("contents", [{}])[0].get("parts", [{}])[0].get("text", "無法生成故事。")
+                reply_msg = f"故事：\n{story_text}"
+            else:
+                reply_msg = "生成故事時出現錯誤。"
+        elif text_condition == 'D':
+            # Handle emotional education-related messages
+            # Generate story based on the message using Gemini API
+            prompt = f"根據訊息「{text}」，生成一個故事，與情感教育相關。"
+            story_response = generate_gmini_story(prompt, gmini_api_key)
+            if story_response:
+                story_text = story_response.get("contents", [{}])[0].get("parts", [{}])[0].get("text", "無法生成故事。")
+                reply_msg = f"故事：\n{story_text}"
+            else:
+                reply_msg = "生成故事時出現錯誤。"
+        else:
+            # Handle other messages
+            # Pass the message to the next condition
+            messages.append({'role': 'user', 'parts': [text]})
+            response = model.generate_content(messages)
+            messages.append({'role': 'model', 'parts': [text]})
+            # Update the conversation history in Firebase
+            fdb.put_async(user_chat_path, None, messages)
+            reply_msg = response.text
+
         await line_bot_api.reply_message(
             ReplyMessageRequest(
                 reply_token=event.reply_token,
-                messages=[TextMessage(text=reply_message)]
-            )
+                messages=[TextMessage(text=reply_msg)]
+            ))
+
+    return 'OK'
         )
 
     return 'OK'
