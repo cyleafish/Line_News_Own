@@ -63,7 +63,7 @@ async def process_user_message(message, user_id):
                 top_article = articles[0]
                 return f"最新新聞：\n\n標題: {top_article['title']}\n描述: {top_article['description']}\n\n更多詳情: {top_article['url']}"
         return "目前沒有相關新聞。"
-   elif "故事" in message:
+    elif "故事" in message:
         # Fetch random news article related to gender equality and emotional education
         news_response = fetch_news_data("性別平等 OR 情感教育", news_api_key)
         if news_response and news_response.get("status") == "ok":
