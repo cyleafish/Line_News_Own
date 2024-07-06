@@ -14,7 +14,6 @@ from linebot.v3.messaging import (
 from linebot.v3.exceptions import InvalidSignatureError
 from linebot.v3.webhooks import MessageEvent, TextMessageContent
 from utils import fetch_news_data, generate_gmini_story
-from firebase import firebase
 
 # 如果不是在生產環境中，則載入 .env 文件中的環境變量
 if os.getenv('API_ENV') != 'production':
@@ -42,33 +41,9 @@ async_api_client = AsyncApiClient(configuration)
 line_bot_api = AsyncMessagingApi(async_api_client)
 parser = WebhookParser(channel_secret)
 
-# 配置 API Key 和 Firebase URL
+# 配置 API Key
 news_api_key = os.getenv('NEWS_API_KEY')
 gmini_api_key = os.getenv('GEMINI_API_KEY')
-firebase_url = os.getenv('FIREBASE_URL')
-fdb = firebase.FirebaseApplication(firebase_url, None)
-
-def save_conversation_to_firebase(user_id, conversation_history):
-    """
-    保存用户对话历史到 Firebase
-    """
-    try:
-        user_chat_path = f"/conversations/{user_id}"
-        fdb.put(user_chat_path, None, conversation_history)
-    except Exception as e:
-        logging.error(f"Failed to save conversation to Firebase: {e}")
-
-def load_conversation_from_firebase(user_id):
-    """
-    从 Firebase 加载用户对话历史
-    """
-    try:
-        user_chat_path = f"/conversations/{user_id}"
-        conversation_history = fdb.get(user_chat_path, None)
-        return conversation_history if conversation_history else []
-    except Exception as e:
-        logging.error(f"Failed to load conversation from Firebase: {e}")
-        return []
 
 @app.get("/health")
 async def health():
@@ -79,9 +54,6 @@ async def process_user_message(message, user_id):
     處理用戶發送的消息並返回相應的回應。
     """
     try:
-        # 从 Firebase 加载用户的对话历史
-        conversation_history = load_conversation_from_firebase(user_id)
-
         if "新聞" in message:
             # 呼叫 fetch_news_data 函數來獲取新聞
             news_response = fetch_news_data("性別歧視", news_api_key)
@@ -90,7 +62,7 @@ async def process_user_message(message, user_id):
                 if articles:
                     top_article = articles[0]
                     return f"最新新聞：\n\n標題: {top_article['title']}\n描述: {top_article['description']}\n\n更多詳情: {top_article['url']}"
-        
+                    
         elif "更多" in message:
             news_response = fetch_news_data("性別", news_api_key)
             if news_response and news_response.get("status") == "ok":
@@ -99,60 +71,42 @@ async def process_user_message(message, user_id):
                 if articles:
                     top_article = articles[newsNo]
                     return f"最新新聞：\n\n標題: {top_article['title']}\n描述: {top_article['description']}\n\n更多詳情: {top_article['url']}"
+        
             return "目前沒有相關新聞。"
 
-        elif "故事" in message or conversation_history:
-            if not conversation_history:
-                # 开始一个新的故事
-                response = await generate_story_based_on_news(news_api_key, gmini_api_key)
-                if response:
-                    # 保存新故事的开头到 Firebase
-                    conversation_history = [{"role": "user", "content": response}]
-                    save_conversation_to_firebase(user_id, conversation_history)
-                    return response
-                else:
-                    return "生成故事時出現錯誤。"
-            else:
-                # 继续已有的故事
-                conversation_history.append({"role": "user", "content": message})
-                response = generate_gmini_story(prompt=message, api_key=gmini_api_key, conversation_history=conversation_history)
-                if response:
-                    # 保存故事的继续部分到 Firebase
-                    conversation_history.append({"role": "model", "content": response})
-                    save_conversation_to_firebase(user_id, conversation_history)
-                    return response
-                else:
-                    return "無法生成回應。"
-
+        elif "故事" in message:
+            # 生成基於新聞的故事
+            response = await generate_story_based_on_news(news_api_key, gmini_api_key, user_id)
+            return response if response else "生成故事時出現錯誤。"
+        
         else:
-            # 处理其他通用消息
-            response = generate_gmini_story(prompt=message, api_key=gmini_api_key)
+            # 生成基於用戶輸入的通用回應
+            response = generate_gmini_story(prompt=message, api_key=gmini_api_key, user_id=user_id, user_choice=message)
             return response if response else "無法生成回應。"
 
     except Exception as e:
         logging.error(f"Error processing user message: {e}")
         return "處理您的請求時出現錯誤。"
 
-async def generate_story_based_on_news(news_api_key, gmini_api_key):
+async def generate_story_based_on_news(news_api_key, gmini_api_key, user_id):
     try:
         news_response = fetch_news_data("性別平等", news_api_key)
         if news_response and news_response.get("status") == "ok":
             articles = news_response.get("articles", [])
             if articles:
-                # 选择第一篇文章
+                # Top 新聞
                 top_article = articles[0]
-                news_title =  top_article.get("title")
+                news_title = top_article.get("title")
                 news_description = top_article.get("description")
                 news_url = top_article.get("url")
                     
                 # 生成故事
                 prompt = f"你是一位性別平等和情感教育老師，你要教導國小生性別平等和情感教育，根據新聞「{news_title}」描述: {news_description} \n生成一個互動故事給學生，在故事中要有選項給學生做選擇"
                
-                story_response = generate_gmini_story(prompt, gmini_api_key)
+                story_response = generate_gmini_story(prompt, gmini_api_key, user_id)
                 
                 if story_response:
-                    story_text = story_response
-                    response = f"新聞：\n\n標題: {news_title}\n\n描述: {news_description}\n\n故事：\n{story_text}\n\n更多詳情: {news_url}"
+                    response = f"新聞：\n\n標題: {news_title}\n\n描述: {news_description}\n\n故事：\n{story_response}\n\n更多詳情: {news_url}"
                     return response
         return None
 
