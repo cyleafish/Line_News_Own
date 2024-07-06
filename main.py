@@ -75,7 +75,7 @@ async def process_user_message(message, user_id):
                 news_url = random_article.get("url")
 
                 # Generate story based on the news article using Gemini API
-                prompt = f"你是一位性別平等和情感教育老師，你要教導國小生性別平等和情感教育，根據新聞「{news_title}」"\n"描述: {news_description}生成一個故事給學生。"
+                prompt = f"你是一位性別平等和情感教育老師，你要教導國小生性別平等和情感教育，根據新聞「{news_title}」\n描述: {news_description}生成一個故事給學生。"
                 story_response = generate_gmini_story(prompt, gmini_api_key)
                 if story_response:
                     story_text = story_response.get("contents", [{}])[0].get("parts", [{}])[0].get("text", "沒有故事。")
