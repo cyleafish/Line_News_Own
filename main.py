@@ -56,7 +56,11 @@ async def process_user_message(message, user_id):
     try:
         if "情境" in message:
             return "選擇一個喜歡的劇本吧！"
-
+            
+        elif "A" in message:
+            response = story_A(message)
+            return response
+            
         elif "新聞" in message:
             # 呼叫 fetch_news_data 函數來獲取新聞
             news_response = fetch_news_data("性別歧視", news_api_key)
