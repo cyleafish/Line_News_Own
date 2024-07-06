@@ -56,7 +56,7 @@ async def process_user_message(message, user_id):
     try:
         if "新聞" in message:
             # 呼叫 fetch_news_data 函數來獲取新聞
-            news_response = fetch_news_data(message, news_api_key)
+            news_response = fetch_news_data("性別歧視", news_api_key)
             if news_response and news_response.get("status") == "ok":
                 articles = news_response.get("articles", [])
                 if articles:
