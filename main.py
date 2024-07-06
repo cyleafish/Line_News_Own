@@ -56,7 +56,7 @@ async def process_user_message(message, user_id):
     try:
         if "新聞" in message:
             # 呼叫 fetch_news_data 函數來獲取新聞
-            news_response = fetch_news_data("性別歧視", news_api_key)
+            news_response = fetch_news_data(message, news_api_key)
             if news_response and news_response.get("status") == "ok":
                 articles = news_response.get("articles", [])
                 if articles:
@@ -89,9 +89,6 @@ async def process_user_message(message, user_id):
         return "處理您的請求時出現錯誤。"
 
 async def generate_story_based_on_news(news_api_key, gmini_api_key):
-    """
-    基於隨機選擇的新聞生成故事。
-    """
     try:
         news_response = fetch_news_data("性別平等", news_api_key)
         if news_response and news_response.get("status") == "ok":
@@ -104,6 +101,7 @@ async def generate_story_based_on_news(news_api_key, gmini_api_key):
                 news_description = random_article.get("description")
                 news_url = random_article.get("url")
                 """
+                
                 #Top 新聞
                 articles = news_response.get("articles", [])
                 top_article = articles[0]
