@@ -103,7 +103,7 @@ async def generate_story_based_on_news(news_api_key, gmini_api_key):
                 news_url = random_article.get("url")
 
                 # 生成故事
-                prompt = f"你是一位性別平等和情感教育老師，你要教導國小生性別平等和情感教育，根據新聞「{news_title}」描述: {news_description} \n生成一個互動故事給學生，在故事中要有選項給學生做選擇，並依據選擇導向不同結局。"
+                prompt = f"你是一位性別平等和情感教育老師，你要教導國小生性別平等和情感教育，根據新聞「{news_title}」描述: {news_description} \n生成一個互動故事給學生，在故事中要有選項給學生做選擇"
                
                 story_response = generate_gmini_story(prompt, gmini_api_key)
                 
