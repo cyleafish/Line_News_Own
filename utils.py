@@ -3,18 +3,17 @@ import logging
 import google.generativeai as genai
 
 def fetch_news_data(query, api_key):
-    """
-    Fetch news data from News API.
-    """
+    #Fetch news data from News API.
+    
     url = f"https://newsapi.org/v2/everything?q={query}&apiKey={api_key}"
     response = requests.get(url)
     return response.json()
 
 
 def generate_gmini_story(prompt, api_key):
-    """
-    Generate story using Google Gemini API.
-    """
+
+    #Generate story using Google Gemini API.
+
     genai.configure(api_key=os.getenv('GEMINI_API_KEY'))
     response = model.generate_content(promot)
     return response.text
@@ -24,9 +23,9 @@ def generate_gmini_story(prompt, api_key):
 
 """        
 def generate_gmini_story(prompt, api_key):
-    """
-    Generate story using Google Gemini API.
-    """
+    
+    #Generate story using Google Gemini API.
+    
     #url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key={api_key}"
     
     payload = {
