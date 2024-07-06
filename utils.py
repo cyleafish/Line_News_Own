@@ -22,6 +22,7 @@ def generate_gmini_story(prompt, api_key):
     """
     genai.configure(api_key=api_key)
     model = genai.GenerativeModel('gemini-1.5-pro')
+    prompt = "使用繁體中文回答\n" + prompt
     try:
        
         response = model.generate_content(prompt)
