@@ -26,7 +26,7 @@ def generate_gmini_story(prompt, api_key):
         
         # 使用 `generate_text` 方法生成文本
         response = genai.generate_text(
-            model="gemini-1.5",  # 尝试使用新的模型名称
+            model="gemini-1.5-pro",  # 尝试使用新的模型名称
             prompt=prompt
         )
 
