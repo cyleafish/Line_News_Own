@@ -20,19 +20,13 @@ def generate_gmini_story(prompt, api_key):
     """
     Generate story using Google Gemini API.
     """
+    model = genai.GenerativeModel('gemini-1.5-pro')
     try:
-        # 配置 API Key
-        genai.configure(api_key=api_key)
-        
-        # 使用 `generate_text` 方法生成文本
-        response = genai.generate_text(
-            model="gemini-1.5-pro",  # 尝试使用新的模型名称
-            prompt=prompt
-        )
-
+       
+        response = model.generate_content(prompt)
         # 提取生成的内容
-        if response and response.generations:
-            return response.generations[0].text
+        if response and response.text:
+            return response.text
         else:
             logging.error("No generations found in response.")
             return "無法生成故事。"
