@@ -63,7 +63,7 @@ async def process_user_message(message, user_id):
                     top_article = articles[0]
                     return f"最新新聞：\n\n標題: {top_article['title']}\n描述: {top_article['description']}\n\n更多詳情: {top_article['url']}"
                     
-        elif "其他新聞" in message:
+        elif "更多" in message:
             news_response = fetch_news_data("性別", news_api_key)
             if news_response and news_response.get("status") == "ok":
                 newsNo = random.randint(1, 50)
