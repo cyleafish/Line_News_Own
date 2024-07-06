@@ -54,7 +54,7 @@ async def process_user_message(message, user_id):
     處理用戶發送的消息並返回相應的回應。
     """
     try:
-        if "情境模擬" or "模擬" in message:
+        if "情境" in message:
             return "選擇一個喜歡的劇本吧！"
 
         elif "新聞" in message:
