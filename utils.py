@@ -77,7 +77,8 @@ def story_A(message):
 
     else:
         return choose
-
+def story_B(message):
+    return "還沒寫好"
 def story_C(message):
     news = "\n\n改寫至: https://consent.yahoo.com/v2/collectConsent?sessionId=1_cc-session_c8aaa472-fca0-40ad-90d3-f4a2c818ea8f"
     start = ("歡迎來到彩虹王國！在這裡，每個人都有著獨一無二的顏色，代表著不同的個性和興趣。"+
