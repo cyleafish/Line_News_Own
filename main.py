@@ -76,37 +76,40 @@ async def process_user_message(message, user_id):
 
         elif "故事" in message:
             # 生成基於新聞的故事
-            response = await generate_story_based_on_news(news_api_key, gmini_api_key, user_id)
+            response = await generate_story_based_on_news(news_api_key, gmini_api_key)
             return response if response else "生成故事時出現錯誤。"
         
         else:
             # 生成基於用戶輸入的通用回應
-            response = generate_gmini_story(prompt=message, api_key=gmini_api_key, user_id=user_id, user_choice=message)
+            response = generate_gmini_story(prompt=message, api_key=gmini_api_key)
             return response if response else "無法生成回應。"
 
     except Exception as e:
         logging.error(f"Error processing user message: {e}")
         return "處理您的請求時出現錯誤。"
 
-async def generate_story_based_on_news(news_api_key, gmini_api_key, user_id):
+async def generate_story_based_on_news(news_api_key, gmini_api_key):
+    """
+    基於隨機選擇的新聞生成故事。
+    """
     try:
         news_response = fetch_news_data("性別平等", news_api_key)
         if news_response and news_response.get("status") == "ok":
             articles = news_response.get("articles", [])
             if articles:
-                # Top 新聞
-                top_article = articles[0]
-                news_title = top_article.get("title")
-                news_description = top_article.get("description")
-                news_url = top_article.get("url")
-                    
+                random_article = articles[random.randrange(len(articles))]
+                news_title = random_article.get("title")
+                news_description = random_article.get("description")
+                news_url = random_article.get("url")
+
                 # 生成故事
                 prompt = f"你是一位性別平等和情感教育老師，你要教導國小生性別平等和情感教育，根據新聞「{news_title}」描述: {news_description} \n生成一個互動故事給學生，在故事中要有選項給學生做選擇"
                
-                story_response = generate_gmini_story(prompt, gmini_api_key, user_id)
+                story_response = generate_gmini_story(prompt, gmini_api_key)
                 
                 if story_response:
-                    response = f"新聞：\n\n標題: {news_title}\n\n描述: {news_description}\n\n故事：\n{story_response}\n\n更多詳情: {news_url}"
+                    story_text = story_response
+                    response = f"新聞：\n\n標題: {news_title}\n\n描述: {news_description}\n\n故事：\n{story_text}\n\n更多詳情: {news_url}"
                     return response
         return None
 
