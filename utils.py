@@ -8,7 +8,8 @@ def fetch_news_data(query, api_key):
     Fetch news data from News API with a focus on Traditional Chinese (Taiwan) content.
     """
     # 指定语言为繁体中文（zh），国家为台湾（tw）
-    url = f"https://newsapi.org/v2/everything?q={query}&apiKey={api_key}&conutry=tw"
+    url = f"https://newsapi.org/v2/everything?q={query}country=tw&apiKey={api_key}"
+    
     response = requests.get(url)
     if response.status_code == 200:
         return response.json()
