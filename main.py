@@ -97,11 +97,20 @@ async def generate_story_based_on_news(news_api_key, gmini_api_key):
         if news_response and news_response.get("status") == "ok":
             articles = news_response.get("articles", [])
             if articles:
+                """
+                #隨機新聞
                 random_article = articles[random.randrange(len(articles))]
                 news_title = random_article.get("title")
                 news_description = random_article.get("description")
                 news_url = random_article.get("url")
-
+                """
+                #Top 新聞
+                articles = news_response.get("articles", [])
+                top_article = articles[0]
+                news_title =  top_article.get("title")
+                news_description = top_article.get("description")
+                news_url = top_article.get("url")
+                    
                 # 生成故事
                 prompt = f"你是一位性別平等和情感教育老師，你要教導國小生性別平等和情感教育，根據新聞「{news_title}」描述: {news_description} \n生成一個互動故事給學生，在故事中要有選項給學生做選擇"
                
