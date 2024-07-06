@@ -1,12 +1,14 @@
 import requests
 import logging
+import google.generativeai as genai
+import os
 
 def fetch_news_data(query, api_key):
     """
     Fetch news data from News API with a focus on Traditional Chinese (Taiwan) content.
     """
     # 指定语言为繁体中文（zh），国家为台湾（tw）
-    url = f"https://newsapi.org/v2/everything?q={query}&apiKey={api_key}"
+    url = f"https://newsapi.org/v2/everything?q={query}&apiKey={api_key}&language=zh&country=tw"
     response = requests.get(url)
     if response.status_code == 200:
         return response.json()
@@ -18,15 +20,13 @@ def generate_gmini_story(prompt, api_key):
     """
     Generate story using Google Gemini API.
     """
-    import google.generativeai as genai
-
     try:
         # 配置 API Key
         genai.configure(api_key=api_key)
         
         # 使用 `generate_text` 方法生成文本
         response = genai.generate_text(
-            model="models/gemini-1.5-flash",
+            model="gemini-1.5",  # 尝试使用新的模型名称
             prompt=prompt
         )
 
