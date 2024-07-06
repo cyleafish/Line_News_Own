@@ -54,7 +54,10 @@ async def process_user_message(message, user_id):
     處理用戶發送的消息並返回相應的回應。
     """
     try:
-        if "新聞" in message:
+        if "情境模擬" or "模擬" in message:
+            return "選擇一個喜歡的劇本吧！"
+
+        elif "新聞" in message:
             # 呼叫 fetch_news_data 函數來獲取新聞
             news_response = fetch_news_data("性別歧視", news_api_key)
             if news_response and news_response.get("status") == "ok":
