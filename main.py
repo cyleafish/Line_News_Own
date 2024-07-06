@@ -80,7 +80,6 @@ async def process_user_message(message, user_id):
                 prompt = f"你是一位性別平等和情感教育老師，你要教導國小生性別平等和情感教育，根據新聞「{news_title}」\n描述: {news_description}生成一個故事給學生。"
                 story_response = generate_gmini_story(prompt, gmini_api_key)
                 if story_response:
-                    return(story_response)
                     story_text = story_response.get("contents", [{}])[0].get("parts", [{}])[0].get("text", "沒有故事。")
                     response = f"新聞：\n\n標題: {news_title}\n\n描述: {news_description}\n\n故事：\n{story_text}\n\n更多詳情: {news_url}"
                     return response
