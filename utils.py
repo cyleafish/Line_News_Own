@@ -1,5 +1,6 @@
 import requests
 import logging
+import google.generativeai as genai
 
 def fetch_news_data(query, api_key):
     """
@@ -9,11 +10,25 @@ def fetch_news_data(query, api_key):
     response = requests.get(url)
     return response.json()
 
+
 def generate_gmini_story(prompt, api_key):
     """
     Generate story using Google Gemini API.
     """
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key={api_key}"
+    genai.configure(api_key=os.getenv('GEMINI_API_KEY'))
+    response = model.generate_content(promot)
+    return response.text
+
+
+
+
+"""        
+def generate_gmini_story(prompt, api_key):
+    """
+    Generate story using Google Gemini API.
+    """
+    #url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key={api_key}"
+    
     payload = {
         "contents": [
             {
@@ -43,7 +58,7 @@ def generate_gmini_story(prompt, api_key):
     except requests.exceptions.RequestException as e:
         logging.error(f"Failed to generate story: {e}")
         return {"error": "無法生成故事。"}
-
+"""
 # 配置重试策略所需的导入
 from requests.adapters import HTTPAdapter
 from requests.packages.urllib3.util.retry import Retry
