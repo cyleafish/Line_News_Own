@@ -20,6 +20,7 @@ def generate_gmini_story(prompt, api_key):
     """
     Generate story using Google Gemini API.
     """
+    genai.configure(api_key=api_key)
     model = genai.GenerativeModel('gemini-1.5-pro')
     try:
        
